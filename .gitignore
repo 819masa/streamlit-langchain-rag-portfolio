@@ -2,4 +2,5 @@
 __pycache__/
 *.pyc
 chroma_db/
+tmp_chroma_test/
 .env
