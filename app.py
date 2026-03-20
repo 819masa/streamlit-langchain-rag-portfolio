@@ -38,7 +38,7 @@ def build_rag_chain(vectorstore: Chroma):
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
     system_prompt = (
-        "あなたはCloudFlowの社内FAQサポートBotです。"
+        "あなたはHello AI!の基本情報サポートBotです。"
         "以下の参考情報だけを使って、ユーザーの質問に丁寧に日本語で回答してください。"
         "参考情報に答えが無い場合は「申し訳ありませんが、その質問に関する情報はFAQに見つかりませんでした。」と回答してください。\n\n"
         "{context}"
@@ -61,8 +61,8 @@ def main():
         layout="centered",
     )
 
-    st.title("☁️ CloudFlow 社内FAQ サポートBot")
-    st.caption("CloudFlowに関する質問をどうぞ。FAQデータをもとにお答えします。")
+    st.title("☁️ Hello AI! 基本情報 サポートBot")
+    st.caption("Hello AI!に関する質問をどうぞ。FAQデータをもとにお答えします。")
 
     vectorstore = build_vectorstore()
     rag_chain = build_rag_chain(vectorstore)
