@@ -3,8 +3,8 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import Chroma
-from langchain_text_splitters import CharacterTextSplitter
+from langchain_core.vectorstores import InMemoryVectorStore
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -12,35 +12,29 @@ from langchain_core.runnables import RunnablePassthrough
 load_dotenv()
 
 FAQ_PATH = "faq_data.txt"
-CHROMA_DIR = "./chroma_db"
 
 
 @st.cache_resource
-def build_vectorstore() -> Chroma:
+def build_vectorstore() -> InMemoryVectorStore:
     with open(FAQ_PATH, encoding="utf-8") as f:
         raw_text = f.read()
 
-    splitter = CharacterTextSplitter(
-        separator="\n\n",
-        chunk_size=300,
-        chunk_overlap=50,
+    splitter = RecursiveCharacterTextSplitter(
+        separators=["\n\n", "\n", "。", "、", " ", ""],
+        chunk_size=1000,
+        chunk_overlap=150,
     )
     docs = splitter.create_documents([raw_text])
 
     embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
-    vectorstore = Chroma.from_documents(
-        documents=docs,
-        embedding=embeddings,
-        persist_directory=CHROMA_DIR,
-    )
-    return vectorstore
+    return InMemoryVectorStore.from_documents(documents=docs, embedding=embeddings)
 
 
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-def build_rag_chain(vectorstore: Chroma):
+def build_rag_chain(vectorstore: InMemoryVectorStore):
     llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
