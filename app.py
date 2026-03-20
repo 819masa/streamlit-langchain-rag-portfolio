@@ -1,6 +1,8 @@
+import os
+
 import streamlit as st
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate
@@ -25,7 +27,7 @@ def build_vectorstore() -> Chroma:
     )
     docs = splitter.create_documents([raw_text])
 
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
     vectorstore = Chroma.from_documents(
         documents=docs,
         embedding=embeddings,
@@ -39,11 +41,11 @@ def format_docs(docs):
 
 
 def build_rag_chain(vectorstore: Chroma):
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
     system_prompt = (
-        "あなたはHello AI!の基本情報サポートBotです。"
+        "あなたはHello AI!の社内FAQサポートBotです。"
         "以下の参考情報だけを使って、ユーザーの質問に丁寧に日本語で回答してください。"
         "参考情報に答えが無い場合は「申し訳ありませんが、その質問に関する情報はFAQに見つかりませんでした。」と回答してください。\n\n"
         "{context}"
@@ -64,7 +66,7 @@ def build_rag_chain(vectorstore: Chroma):
 
 def main():
     st.set_page_config(
-        page_title="CloudFlow FAQ Bot",
+        page_title="Hello AI! FAQ Bot",
         page_icon="☁️",
         layout="centered",
     )
@@ -77,7 +79,7 @@ def main():
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            {"role": "assistant", "content": "こんにちは！CloudFlowに関するご質問をどうぞ。"}
+            {"role": "assistant", "content": "こんにちは！Hello AI!に関するご質問をどうぞ。"}
         ]
 
     for msg in st.session_state.messages:
