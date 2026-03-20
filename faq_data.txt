@@ -2,15 +2,17 @@
 
 
 # Hello AI サークル 基本情報
-* [cite_start]**設立**: 2025年5月創立 [cite: 108]
-* [cite_start]**スポンサー**: 東京大学松尾研発スタートアップ 2WINS [cite: 109]
-* [cite_start]**Mission / Vision**: 本郷クオリティのトップAI人材を全国に [cite: 122]
+* [cite_start]**設立**: 2025年5月創立 
+* [cite_start]**スポンサー**: 東京大学松尾研発スタートアップ 2WINS 
+* [cite_start]**Mission / Vision**: 本郷クオリティのトップAI人材を全国に 
 * **3つの特徴**:
     1.  [cite_start]本郷クオリティの全国サークル 
     2.  [cite_start]究極のLearn to Earn 
     3.  [cite_start]本気で挑戦する学生の居場所 
 
----
+仮メンバーは170名
+正式メンバーは61名
+
 
 ## エコシステム（学びと挑戦の3本柱）
 Hello AIでは、以下の3つの要素からなるエコシステムを創っています。
