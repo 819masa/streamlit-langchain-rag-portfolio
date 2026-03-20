@@ -2,10 +2,10 @@ import streamlit as st
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_text_splitters import CharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 
 load_dotenv()
 
@@ -34,8 +34,13 @@ def build_vectorstore() -> Chroma:
     return vectorstore
 
 
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
 def build_rag_chain(vectorstore: Chroma):
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
     system_prompt = (
         "あなたはHello AI!の基本情報サポートBotです。"
@@ -46,12 +51,15 @@ def build_rag_chain(vectorstore: Chroma):
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt),
-        ("human", "{input}"),
+        ("human", "{question}"),
     ])
 
-    question_answer_chain = create_stuff_documents_chain(llm, prompt)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-    return create_retrieval_chain(retriever, question_answer_chain)
+    return (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
 
 
 def main():
@@ -83,8 +91,7 @@ def main():
 
         with st.chat_message("assistant"):
             with st.spinner("回答を生成中…"):
-                result = rag_chain.invoke({"input": user_input})
-                answer = result["answer"]
+                answer = rag_chain.invoke(user_input)
             st.markdown(answer)
 
         st.session_state.messages.append({"role": "assistant", "content": answer})
