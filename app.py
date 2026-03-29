@@ -26,8 +26,8 @@ SAMPLE_QUESTIONS = [
 ]
 
 LINE_URL = os.getenv("HELLOAI_LINE_URL", "")
-INSTAGRAM_URL = os.getenv("HELLOAI_INSTAGRAM_URL", "")
-X_URL = os.getenv("HELLOAI_X_URL", "")
+INSTAGRAM_URL = os.getenv("HELLOAI_INSTAGRAM_URL", "https://www.instagram.com/hello_ai_utokyo/")
+X_URL = os.getenv("HELLOAI_X_URL", "https://x.com/Hello_AI_todai")
 INFO_SESSION_TEXT = os.getenv(
     "HELLOAI_INFO_SESSION_TEXT",
     "説明会情報はここに表示できます。実際の日時・場所・申込方法に差し替えてください。",
@@ -275,11 +275,40 @@ def render_quick_questions() -> str | None:
 
 def render_join_section() -> None:
     st.markdown(
+        f"""
+        <div class="join-card">
+            <div class="join-title">直近イベント</div>
+            <div class="join-copy">
+                <strong>🔥 AI解約予測コンペ</strong>（4/13〜4/27）<br>
+                実データでモデル構築に挑戦！初心者歓迎。上位者にはインターン選考優遇も。<br><br>
+                <strong>🍕 オフライン新歓＠渋谷</strong>（4/17 19:00〜）<br>
+                「AIで大学生活をハックする」— 無料食事付き！
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    event_cols = st.columns(2)
+    with event_cols[0]:
+        st.link_button(
+            "コンペに申し込む",
+            "https://forms.gle/NK5DheqjLu1rGRms8",
+            use_container_width=True,
+        )
+    with event_cols[1]:
+        st.link_button(
+            "新歓に申し込む",
+            "https://forms.gle/w6Mtshsqjq7WyhWJ8",
+            use_container_width=True,
+        )
+
+    st.markdown(
         """
         <div class="join-card">
-            <div class="join-title">入会・説明会の案内</div>
+            <div class="join-title">入会・SNS</div>
             <div class="join-copy">
-                興味を持ったら、SNSやLINEから気軽にチェックしてください。説明会情報もここにまとめています。
+                興味を持ったらSNSやLINEから気軽にチェックしてください。
             </div>
         </div>
         """,
@@ -305,9 +334,6 @@ def render_join_section() -> None:
             st.link_button("X", X_URL, use_container_width=True)
         else:
             st.caption("X URL 未設定")
-
-    st.markdown('<div class="section-label">説明会情報</div>', unsafe_allow_html=True)
-    st.info(INFO_SESSION_TEXT)
 
 
 def run_chat_turn(question: str, rag_chain) -> None:
