@@ -183,6 +183,36 @@ def inject_custom_css() -> None:
             background: white;
             color: {PRIMARY_COLOR};
             font-weight: 700;
+            transition: all 0.2s ease;
+        }}
+
+        div.stLinkButton > a:hover {{
+            box-shadow: 0 8px 24px rgba(0, 48, 89, 0.12);
+            transform: translateY(-1px);
+        }}
+
+        div.cta-button div.stLinkButton > a {{
+            background: linear-gradient(135deg, {PRIMARY_COLOR} 0%, {SECONDARY_COLOR} 100%);
+            color: white !important;
+            border: none;
+            font-size: 1.05rem;
+            font-weight: 800;
+            padding: 0.85rem 1rem;
+            border-radius: 16px;
+            box-shadow: 0 12px 28px rgba(0, 48, 89, 0.22);
+            letter-spacing: 0.02em;
+            transition: all 0.25s ease;
+        }}
+
+        div.cta-button div.stLinkButton > a:hover {{
+            box-shadow: 0 16px 36px rgba(0, 48, 89, 0.32);
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+        }}
+
+        div.cta-button div.stLinkButton > a:active {{
+            transform: translateY(0px);
+            box-shadow: 0 6px 16px rgba(0, 48, 89, 0.18);
         }}
 
         @media (max-width: 640px) {{
@@ -300,11 +330,14 @@ def render_join_section() -> None:
         """,
         unsafe_allow_html=True,
     )
-    st.link_button(
-        "コンペに申し込む",
-        "https://forms.gle/NK5DheqjLu1rGRms8",
-        use_container_width=True,
-    )
+    with st.container():
+        st.markdown('<div class="cta-button">', unsafe_allow_html=True)
+        st.link_button(
+            "🔥 コンペに申し込む（無料）",
+            "https://forms.gle/NK5DheqjLu1rGRms8",
+            use_container_width=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown(
         f"""
@@ -319,11 +352,14 @@ def render_join_section() -> None:
         """,
         unsafe_allow_html=True,
     )
-    st.link_button(
-        "新歓に申し込む（1分で完了）",
-        "https://forms.gle/w6Mtshsqjq7WyhWJ8",
-        use_container_width=True,
-    )
+    with st.container():
+        st.markdown('<div class="cta-button">', unsafe_allow_html=True)
+        st.link_button(
+            "🍕 4/17の新歓イベントに参加する（1分で完了・食事付き）",
+            "https://forms.gle/w6Mtshsqjq7WyhWJ8",
+            use_container_width=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown(
         """
