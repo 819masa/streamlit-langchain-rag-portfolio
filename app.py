@@ -25,7 +25,7 @@ SAMPLE_QUESTIONS = [
     "入会方法を教えてください",
 ]
 
-LINE_URL = os.getenv("HELLOAI_LINE_URL", "")
+LINE_URL = os.getenv("HELLOAI_LINE_URL", "https://lin.ee/vo4MyqI")
 INSTAGRAM_URL = os.getenv("HELLOAI_INSTAGRAM_URL", "https://www.instagram.com/hello_ai_utokyo/")
 X_URL = os.getenv("HELLOAI_X_URL", "https://x.com/Hello_AI_todai")
 INFO_SESSION_TEXT = os.getenv(
@@ -277,38 +277,60 @@ def render_join_section() -> None:
     st.markdown(
         f"""
         <div class="join-card">
-            <div class="join-title">直近イベント</div>
+            <div class="join-title">🚀 大学生活、後悔したくないなら</div>
             <div class="join-copy">
-                <strong>🔥 AI解約予測コンペ</strong>（4/13〜4/27）<br>
-                実データでモデル構築に挑戦！初心者歓迎。上位者にはインターン選考優遇も。<br><br>
-                <strong>🍕 オフライン新歓＠渋谷</strong>（4/17 19:00〜）<br>
-                「AIで大学生活をハックする」— 無料食事付き！
+                AIを武器にすれば、学び方も働き方も変わる。<br>
+                Hello AI! は、本気で挑戦したい学生が集まる場所です。
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    event_cols = st.columns(2)
-    with event_cols[0]:
-        st.link_button(
-            "コンペに申し込む",
-            "https://forms.gle/NK5DheqjLu1rGRms8",
-            use_container_width=True,
-        )
-    with event_cols[1]:
-        st.link_button(
-            "新歓に申し込む",
-            "https://forms.gle/w6Mtshsqjq7WyhWJ8",
-            use_container_width=True,
-        )
+    st.markdown(
+        f"""
+        <div class="join-card">
+            <div class="join-title">🔥 AI解約予測コンペ</div>
+            <div class="join-copy">
+                実データでモデル構築に挑戦！初心者歓迎。<br>
+                上位者にはインターン選考優遇も。<br>
+                <strong>期間：4/13（月）〜 4/27（月）23:59</strong>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.link_button(
+        "コンペに申し込む",
+        "https://forms.gle/NK5DheqjLu1rGRms8",
+        use_container_width=True,
+    )
+
+    st.markdown(
+        f"""
+        <div class="join-card">
+            <div class="join-title">🍕 オフライン新歓＠渋谷</div>
+            <div class="join-copy">
+                「AIで大学生活をハックする —— 後悔しないための10の武器」<br>
+                <strong>4/17（金）19:00〜 ｜ 無料食事付き！</strong><br>
+                AIを使いこなして学習・効率を最大化する方法 / スタートアップが求める人材 / 交流会
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.link_button(
+        "新歓に申し込む（1分で完了）",
+        "https://forms.gle/w6Mtshsqjq7WyhWJ8",
+        use_container_width=True,
+    )
 
     st.markdown(
         """
         <div class="join-card">
-            <div class="join-title">入会・SNS</div>
+            <div class="join-title">📲 LINE・SNSをフォロー</div>
             <div class="join-copy">
-                興味を持ったらSNSやLINEから気軽にチェックしてください。
+                最新のイベント情報や活動報告はこちらから。気軽にフォローしてください。
             </div>
         </div>
         """,
@@ -318,22 +340,13 @@ def render_join_section() -> None:
     if LINE_QR_PATH and os.path.exists(LINE_QR_PATH):
         st.image(LINE_QR_PATH, caption="LINE登録用QR", use_container_width=True)
 
-    if LINE_URL:
-        st.link_button("LINEで問い合わせる", LINE_URL, use_container_width=True)
-    else:
-        st.caption("`HELLOAI_LINE_URL` を設定するとLINE導線を表示できます。")
+    st.link_button("LINE公式アカウントを追加", LINE_URL, use_container_width=True)
 
     social_cols = st.columns(2)
     with social_cols[0]:
-        if INSTAGRAM_URL:
-            st.link_button("Instagram", INSTAGRAM_URL, use_container_width=True)
-        else:
-            st.caption("Instagram URL 未設定")
+        st.link_button("Instagram", INSTAGRAM_URL, use_container_width=True)
     with social_cols[1]:
-        if X_URL:
-            st.link_button("X", X_URL, use_container_width=True)
-        else:
-            st.caption("X URL 未設定")
+        st.link_button("X (Twitter)", X_URL, use_container_width=True)
 
 
 def run_chat_turn(question: str, rag_chain) -> None:
