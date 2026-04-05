@@ -3,7 +3,7 @@
 ## 現状まとめ
 
 - UI: Streamlit でスマホ向けに構築済み（濃紺テーマ、ヒーローカード、CTA ボタン等）
-- RAG: Gemini 2.0 Flash + InMemoryVectorStore で FAQ 検索・回答
+- RAG: Gemini 2.0 Flash + Supabase pgvector で FAQ 検索・回答
 - 質問ログ: Supabase (PostgreSQL) に保存 + Gemini でカテゴリ自動分類
 - イベント導線: コンペ・新歓・LINE・Instagram・X のリンク設置済み
 - テーマ: `.streamlit/config.toml` でライトモード強制済み
@@ -25,6 +25,8 @@
 - [x] API キー未設定時のエラー表示
 - [x] Supabase で質問ログ保存の実装
 - [x] Streamlit Community Cloud にデプロイ・公開
+- [x] InMemoryVectorStore → Supabase pgvector に移行
+- [x] `reindex.py`（FAQ 再インデックススクリプト）を作成
 
 ## 最優先
 
@@ -50,12 +52,12 @@
 - [x] `pytest` を導入してコア処理のテストを書く（15テスト）
 - [x] 回答精度チューニング（`chunk_size=600` / `overlap=100` / `k=4` / プロンプト改善）
 
-## 永続ベクトルストア移行（中期）
+## 永続ベクトルストア（pgvector 移行済み）
 
-- [ ] FAQ が増えてきたら、ベクトルストアの永続化を検討する
-- [ ] 候補: pgvector (Supabase 内蔵) / Qdrant / Chroma Server (Docker)
-- [ ] Supabase の pgvector なら DB を一本化できて運用が楽
-- [ ] FAQ 更新時の再インデックスをスクリプト化する
+- [x] Supabase pgvector に移行（`SupabaseVectorStore`）
+- [x] DB を Supabase に一本化（質問ログ + ベクトル検索）
+- [x] FAQ 更新時の再インデックススクリプト（`reindex.py`）を作成
+- [x] `supabase_pgvector_setup.sql` を作成（テーブル + 検索関数 + RLS）
 
 ## 運用・安定化
 

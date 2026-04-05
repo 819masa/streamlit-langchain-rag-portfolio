@@ -3,14 +3,16 @@ from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmb
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from langchain_core.vectorstores import InMemoryVectorStore
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import SupabaseVectorStore
 
-from config import FAQ_PATH
+from config import get_secret
+from db import get_supabase
 
-CHUNK_SIZE = 600
-CHUNK_OVERLAP = 100
+EMBEDDING_MODEL = "models/gemini-embedding-001"
+EMBEDDING_DIMS = 768
 RETRIEVER_K = 4
+TABLE_NAME = "documents"
+QUERY_NAME = "match_documents"
 
 SYSTEM_PROMPT = (
     "あなたは Hello AI! のFAQサポートBotです。\n"
@@ -26,23 +28,29 @@ def _format_docs(docs) -> str:
     return "\n\n---\n\n".join(doc.page_content for doc in docs)
 
 
-@st.cache_resource
-def build_vectorstore() -> InMemoryVectorStore:
-    with open(FAQ_PATH, encoding="utf-8") as f:
-        raw_text = f.read()
-
-    splitter = RecursiveCharacterTextSplitter(
-        separators=["\n\n", "\n", "。", "、", " ", ""],
-        chunk_size=CHUNK_SIZE,
-        chunk_overlap=CHUNK_OVERLAP,
+def _get_embeddings() -> GoogleGenerativeAIEmbeddings:
+    return GoogleGenerativeAIEmbeddings(
+        model=EMBEDDING_MODEL,
+        task_type="retrieval_query",
     )
-    docs = splitter.create_documents([raw_text])
-
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
-    return InMemoryVectorStore.from_documents(documents=docs, embedding=embeddings)
 
 
-def build_rag_chain(vectorstore: InMemoryVectorStore):
+@st.cache_resource
+def build_vectorstore() -> SupabaseVectorStore:
+    sb = get_supabase()
+    if sb is None:
+        st.error("Supabase に接続できません。環境変数を確認してください。")
+        st.stop()
+
+    return SupabaseVectorStore(
+        client=sb,
+        embedding=_get_embeddings(),
+        table_name=TABLE_NAME,
+        query_name=QUERY_NAME,
+    )
+
+
+def build_rag_chain(vectorstore: SupabaseVectorStore):
     llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
     retriever = vectorstore.as_retriever(search_kwargs={"k": RETRIEVER_K})
 

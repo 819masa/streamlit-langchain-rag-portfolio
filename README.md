@@ -13,7 +13,7 @@
 | LLM | Google Gemini 2.0 Flash |
 | 埋め込みモデル | Gemini Embedding 001 |
 | フレームワーク | LangChain (LCEL) |
-| ベクトルストア | LangChain InMemoryVectorStore |
+| ベクトルストア | Supabase pgvector |
 | 質問ログ DB | Supabase (PostgreSQL) |
 | デプロイ | Streamlit Community Cloud |
 
@@ -25,15 +25,17 @@
 Streamlit UI
   ↓
 LangChain LCEL Chain
-  ├─ Retriever（InMemoryVectorStore ← FAQ テキスト）
+  ├─ Retriever（Supabase pgvector）
   ├─ Gemini 2.0 Flash（回答生成）
   └─ Gemini（質問カテゴリ自動分類）
         ↓
-Supabase（質問・回答・カテゴリをログ保存）
+Supabase
+  ├─ documents テーブル（FAQ ベクトル検索）
+  └─ question_logs テーブル（質問ログ保存）
 ```
 
-1. **起動時**: `faq_data.txt` を `RecursiveCharacterTextSplitter` でチャンク分割 → Gemini Embeddings でベクトル化 → インメモリストアに保持
-2. **質問時**: Retriever で関連チャンクを検索 → コンテキスト + 質問を Gemini に渡して回答生成
+1. **事前準備**: `python reindex.py` で `faq_data.txt` をチャンク分割 → Gemini Embeddings でベクトル化 → Supabase pgvector に登録
+2. **質問時**: Retriever で Supabase から関連チャンクを検索 → コンテキスト + 質問を Gemini に渡して回答生成
 3. **ログ**: 質問を Gemini でカテゴリ分類し、Supabase に保存（FAQ 改善ループ用）
 
 ## ローカル開発
@@ -56,10 +58,15 @@ copy .env.example .env        # Windows
 # cp .env.example .env        # macOS / Linux
 # .env を開いて各キーを入力
 
-# 5. (任意) Supabase のテーブルを作成
-# Supabase SQL Editor で supabase_setup.sql を実行
+# 5. Supabase のテーブルを作成
+# Supabase SQL Editor で以下を順に実行:
+#   - supabase_setup.sql        (質問ログ用)
+#   - supabase_pgvector_setup.sql (FAQベクトル検索用)
 
-# 6. 起動
+# 6. FAQ データをインデックス
+python reindex.py
+
+# 7. 起動
 streamlit run app.py --server.port 8504 --server.fileWatcherType none
 ```
 
@@ -90,12 +97,14 @@ python -m pytest tests/ -v
 ```
 ├── app.py                 # エントリポイント（main + チャットターン）
 ├── config.py              # 定数・設定・シークレット読み込み
-├── chain.py               # RAG チェーン構築（ベクトルストア・プロンプト）
+├── chain.py               # RAG チェーン構築（Supabase pgvector・プロンプト）
 ├── db.py                  # Supabase 接続・質問ログ・カテゴリ分類
 ├── ui.py                  # CSS・ヘッダー・イベントセクション描画
+├── reindex.py             # FAQ 再インデックススクリプト
 ├── faq_data.txt           # FAQ データソース
 ├── requirements.txt       # Python 依存パッケージ
-├── supabase_setup.sql     # Supabase テーブル定義
+├── supabase_setup.sql     # Supabase テーブル定義（質問ログ）
+├── supabase_pgvector_setup.sql  # Supabase pgvector 定義（FAQ検索）
 ├── .env.example           # 環境変数テンプレート
 ├── .streamlit/
 │   └── config.toml        # Streamlit テーマ設定（ライトモード強制）
