@@ -79,16 +79,32 @@ SUPABASE_URL = "https://your-project.supabase.co"
 SUPABASE_ANON_KEY = "your_supabase_anon_key"
 ```
 
+## テスト
+
+```bash
+python -m pytest tests/ -v
+```
+
 ## ファイル構成
 
 ```
-├── app.py                 # メインアプリケーション
+├── app.py                 # エントリポイント（main + チャットターン）
+├── config.py              # 定数・設定・シークレット読み込み
+├── chain.py               # RAG チェーン構築（ベクトルストア・プロンプト）
+├── db.py                  # Supabase 接続・質問ログ・カテゴリ分類
+├── ui.py                  # CSS・ヘッダー・イベントセクション描画
 ├── faq_data.txt           # FAQ データソース
 ├── requirements.txt       # Python 依存パッケージ
 ├── supabase_setup.sql     # Supabase テーブル定義
 ├── .env.example           # 環境変数テンプレート
 ├── .streamlit/
 │   └── config.toml        # Streamlit テーマ設定（ライトモード強制）
+├── tests/                 # pytest テスト
+│   ├── test_config.py
+│   ├── test_chain.py
+│   └── test_db.py
+├── docs/
+│   └── faq_update_guide.md  # FAQ 更新手順ガイド
 ├── TODO.md                # 今後の改善計画
 └── README.md
 ```

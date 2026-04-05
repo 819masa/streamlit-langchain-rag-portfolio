@@ -44,11 +44,11 @@
 
 ## コード品質・保守性
 
-- [ ] `app.py` をファイル分割する（`ui.py` / `chain.py` / `db.py` 等）
-- [ ] `README.md` を最新の構成に合わせて書き直す
-- [ ] FAQ データの更新手順を文書化する
-- [ ] `pytest` を導入してコア処理のテストを書く
-- [ ] 回答精度チューニング（`chunk_size` / `chunk_overlap` / `k` / プロンプト調整）
+- [x] `app.py` をファイル分割（`config.py` / `chain.py` / `db.py` / `ui.py`）
+- [x] `README.md` を最新の構成に合わせて書き直す
+- [x] FAQ データの更新手順を文書化する（`docs/faq_update_guide.md`）
+- [x] `pytest` を導入してコア処理のテストを書く（15テスト）
+- [x] 回答精度チューニング（`chunk_size=600` / `overlap=100` / `k=4` / プロンプト改善）
 
 ## 永続ベクトルストア移行（中期）
 
