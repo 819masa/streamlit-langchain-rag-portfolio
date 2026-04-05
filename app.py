@@ -14,6 +14,17 @@ load_dotenv()
 
 _supabase_client = None
 
+
+def _get_secret(key: str, default: str = "") -> str:
+    """os.environ → st.secrets の順で値を探す。どちらにも無ければ default を返す。"""
+    val = os.environ.get(key, "")
+    if val:
+        return val
+    try:
+        return st.secrets[key]
+    except (KeyError, FileNotFoundError):
+        return default
+
 FAQ_PATH = "faq_data.txt"
 APP_NAME = "Hello AI! Q&Aボット"
 APP_SUBTITLE = "Hello AI の疑問をすぐ解決できる、サークルメンバー開発のAIチャットボット"
@@ -28,14 +39,14 @@ SAMPLE_QUESTIONS = [
     "入会方法を教えてください",
 ]
 
-LINE_URL = os.getenv("HELLOAI_LINE_URL", "https://lin.ee/vo4MyqI")
-INSTAGRAM_URL = os.getenv("HELLOAI_INSTAGRAM_URL", "https://www.instagram.com/hello_ai_utokyo/")
-X_URL = os.getenv("HELLOAI_X_URL", "https://x.com/Hello_AI_todai")
-INFO_SESSION_TEXT = os.getenv(
+LINE_URL = _get_secret("HELLOAI_LINE_URL", "https://lin.ee/vo4MyqI")
+INSTAGRAM_URL = _get_secret("HELLOAI_INSTAGRAM_URL", "https://www.instagram.com/hello_ai_utokyo/")
+X_URL = _get_secret("HELLOAI_X_URL", "https://x.com/Hello_AI_todai")
+INFO_SESSION_TEXT = _get_secret(
     "HELLOAI_INFO_SESSION_TEXT",
     "説明会情報はここに表示できます。実際の日時・場所・申込方法に差し替えてください。",
 )
-LINE_QR_PATH = os.getenv("HELLOAI_LINE_QR_PATH", "")
+LINE_QR_PATH = _get_secret("HELLOAI_LINE_QR_PATH", "")
 
 
 QUESTION_CATEGORIES = [
@@ -55,8 +66,8 @@ def get_supabase():
     if _supabase_client is not None:
         return _supabase_client
 
-    url = os.getenv("SUPABASE_URL", "")
-    key = os.getenv("SUPABASE_ANON_KEY", "")
+    url = _get_secret("SUPABASE_URL")
+    key = _get_secret("SUPABASE_ANON_KEY")
     if not url or not key:
         return None
 
@@ -492,7 +503,10 @@ def main():
     inject_custom_css()
     render_header()
 
-    if not os.getenv("GOOGLE_API_KEY"):
+    google_api_key = _get_secret("GOOGLE_API_KEY")
+    if google_api_key:
+        os.environ["GOOGLE_API_KEY"] = google_api_key
+    if not os.environ.get("GOOGLE_API_KEY"):
         st.error("`.env` に `GOOGLE_API_KEY` を設定してください。")
         st.stop()
 
